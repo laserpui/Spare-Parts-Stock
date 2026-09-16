@@ -18,6 +18,21 @@ const state = {
   loading: false
 };
 const labels = { borrowed: "กำลังยืม", returned: "คืนแล้ว" };
+const requesterNames = [
+  "จีรศักดิ์ คำศรี",
+  "ชาติชาย น่าบัณฑิต",
+  "ภาสพงษ์ คำศรี",
+  "พงษ์ศักดิ์ จัการพิมพ์",
+  "สมชาย มูลเงิน",
+  "ธนบูรณ์ ศุภชาติสันติ",
+  "ณัฐพงษ์ กลิ่นจันทร์",
+  "กันต์ศักดิ์ ฉลาดเฉลียว",
+  "ประวิทย์ ฉลาดเฉลียว",
+  "กษิเดช อิทธิธนาบุญ",
+  "เอกเลิศ ตันติยมาศ",
+  "อภิลักษณ์ หาไธสง",
+  "ธนาธิป ขยัน"
+].sort(new Intl.Collator("th").compare);
 const recordsBody = document.querySelector("#recordsBody");
 const emptyState = document.querySelector("#emptyState");
 const historyRecordsBody = document.querySelector("#historyRecordsBody");
@@ -68,6 +83,7 @@ function normalizeRecord(record) {
     id: String(record.id),
     job: record.jobNumber || record.job || "",
     jobNumber: record.jobNumber || record.job || "",
+    customerName: String(record.customerName || ""),
     partNames,
     part: partNames[0] || "-",
     qty: Number(record.quantity ?? record.qty) || partNames.length,
@@ -82,6 +98,17 @@ function normalizeRecord(record) {
     status: record.status === "returned" ? "returned" : "borrowed",
     code: record.code || ""
   };
+}
+
+function populateRequesterOptions() {
+  const select = document.querySelector("#requesterName");
+  const options = requesterNames.map(name => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    return option;
+  });
+  select.append(...options);
 }
 
 async function apiRequest(action, payload = {}) {
@@ -200,7 +227,7 @@ function createRecordRow(record) {
   return `
       <tr>
         <td class="date-cell"><strong>${escapeHtml(record.date)}</strong><span>${escapeHtml(record.time)} น.</span></td>
-        <td class="job-cell"><strong>${escapeHtml(record.job)}</strong><span>ผู้เบิก ${escapeHtml(record.requesterName || "-")}</span></td>
+        <td class="job-cell"><strong>${escapeHtml(record.job)}</strong><span>ผู้เบิก ${escapeHtml(record.requesterName || "-")}</span>${record.customerName ? `<span>ลูกค้า ${escapeHtml(record.customerName)}</span>` : ""}</td>
         <td class="part-cell">${renderPartSummary(partNames)}<span>${escapeHtml(itemMeta)}</span></td>
         <td><span class="destination"><i class="destination-dot"></i>${escapeHtml(record.destination)}</span></td>
         <td>${escapeHtml(record.qty)} ${escapeHtml(record.unit)}</td>
@@ -212,7 +239,7 @@ function createRecordRow(record) {
 function getFilteredRecords() {
   const term = state.search.trim().toLowerCase();
   return records.filter(record => {
-    const searchable = [record.job, record.requesterName || "", record.destination, record.sourceSerialNumber || record.serial || "", record.code, ...getPartNames(record)];
+    const searchable = [record.job, record.requesterName || "", record.customerName || "", record.destination, record.sourceSerialNumber || record.serial || "", record.code, ...getPartNames(record)];
     return (state.filter === "all" || record.status === state.filter) && (!term || searchable.some(value => String(value || "").toLowerCase().includes(term)));
   });
 }
@@ -344,6 +371,7 @@ function createFollowUpText(record) {
     "ติดตามการยืมอะไหล่",
     `เลขงาน: ${record.job}`,
     `ชื่อผู้เบิก: ${record.requesterName || "-"}`,
+    record.customerName ? `ชื่อลูกค้า: ${record.customerName}` : "",
     "รายการอะไหล่:",
     partLines,
     `จำนวนรวม: ${record.qty} ${record.unit}`,
@@ -371,7 +399,7 @@ function exportData() {
 
   const headers = [
     "รหัสรายการ", "วันที่ยืม", "เวลา", "วันที่กำหนดคืน", "วันที่คืนจริง",
-    "เลขงาน", "ชื่อผู้เบิก", "ชื่ออะไหล่", "จำนวน", "หน่วย",
+    "เลขงาน", "ชื่อผู้เบิก", "ชื่อลูกค้า", "ชื่ออะไหล่", "จำนวน", "หน่วย",
     "นำมาจาก", "หมายเลขเครื่อง (Serial Number)", "สถานะ", "หมายเหตุ"
   ];
   const rows = exportRecords.map(record => [
@@ -382,6 +410,7 @@ function exportData() {
     record.actualReturnDate || "",
     record.job,
     record.requesterName || "",
+    record.customerName || "",
     getPartNames(record).join(" | "),
     record.qty,
     record.unit,
@@ -584,6 +613,7 @@ form.addEventListener("submit", async event => {
     dueDate: dueDateValue,
     jobNumber: data.get("jobNumber").trim(),
     requesterName: data.get("requesterName").trim(),
+    customerName: data.get("customerName").trim(),
     partNames,
     quantity: Number(data.get("quantity")),
     unit: data.get("unit"),
@@ -668,5 +698,6 @@ document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("cl
 
 document.querySelector("#todayLabel").textContent = new Intl.DateTimeFormat("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 applyTheme(document.documentElement.dataset.theme || "light");
+populateRequesterOptions();
 resetBorrowForm();
 loadRecords();

@@ -213,7 +213,8 @@
         <label><span>วันที่ยืม <em>*</em></span><input id="borrowDate" name="borrowDate" type="date" required></label>
         <label id="returnDateField"><span>วันที่กำหนดคืน <em>*</em></span><input id="returnDate" name="returnDate" type="date" required><small>ต้องเป็นวันเดียวกับหรือหลังวันที่ยืม</small></label>
         <label class="full"><span>เลขงาน <em>*</em></span><input name="jobNumber" type="text" placeholder="เช่น WO-2569-0148" autocomplete="off" required></label>
-        <label class="full"><span>ชื่อผู้เบิก <em>*</em></span><input name="requesterName" type="text" placeholder="กรอกชื่อ–นามสกุลผู้เบิก" autocomplete="name" required></label>
+        <label class="full"><span>ชื่อลูกค้า <small>(ไม่บังคับ)</small></span><input name="customerName" type="text" placeholder="กรอกชื่อบริษัท โรงพยาบาล หรือชื่อลูกค้า" autocomplete="organization"></label>
+        <label class="full"><span>ชื่อผู้เบิก <em>*</em></span><select id="requesterName" name="requesterName" required><option value="">เลือกชื่อผู้เบิก</option></select></label>
         <label class="full"><span>นำมาจาก <em>*</em></span><select id="destination" name="destination" required><option value="เครื่อง Demo">เครื่อง Demo</option><option value="เครื่องใหม่">เครื่องใหม่</option><option value="เครื่องลูกค้า">เครื่องลูกค้า</option><option value="อะไหล่ใหม่">อะไหล่ใหม่</option><option value="อื่นๆ">อื่นๆ</option></select></label>
         <label class="full" id="otherDestinationField" hidden><span>ระบุแหล่งที่มา <em>*</em></span><input name="otherDestination" type="text" placeholder="ระบุว่าอะไหล่นำมาจากที่ใด"></label>
         <label class="full"><span>หมายเลขเครื่อง (Serial Number) <small>(ไม่บังคับ)</small></span><input name="sourceSerialNumber" type="text" placeholder="หมายเลขเครื่องหรือแหล่งที่นำมาจาก" autocomplete="off"><small class="field-help">ใช้เชื่อมโยงกับข้อมูลในช่อง “นำมาจาก”</small></label>
@@ -250,6 +251,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon">✓</span><div><strong>บันทึกรายการแล้ว</strong><p>เพิ่มรายการลงในประวัติเรียบร้อย</p></div></div>
   <script src="config.js?v=1"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
